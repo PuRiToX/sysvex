@@ -17,13 +17,13 @@ def is_linux():
 def get_default_reports_dir():
     """Get default reports directory for the current platform"""
     if is_windows():
-        # Windows: Documents\Sysvex Auditing
+        # Windows: Documents\Sysvex Audits
         documents = os.path.expandvars(r'%USERPROFILE%\Documents')
-        return os.path.join(documents, 'Sysvex Auditing')
+        return os.path.join(documents, 'Sysvex Audits')
     else:
-        # Linux: ~/Documents/Sysvex Auditing
+        # Linux: ~/Documents/Sysvex Audits
         home = os.path.expanduser('~')
-        return os.path.join(home, 'Documents', 'Sysvex Auditing')
+        return os.path.join(home, 'Documents', 'Sysvex Audits')
 
 def ensure_reports_dir():
     """Ensure reports directory exists and return path"""
