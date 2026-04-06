@@ -1,6 +1,6 @@
 [project]
 name = "sysvex"
-version = "0.1.0"
+version = "0.1.1"
 description = "Modular system security auditing toolkit"
 authors = [
     { name = "PuRIToX" }
