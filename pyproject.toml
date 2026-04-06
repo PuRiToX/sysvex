@@ -3,7 +3,7 @@ name = "sysvex"
 version = "0.1.1"
 description = "Modular system security auditing toolkit"
 authors = [
-    { name = "PuRIToX" }
+    { name = "PuRiToX" }
 ]
 readme = "README.md"
 license = "MIT"

@@ -20,13 +20,13 @@ The app automatically detects your platform and adjusts its security checks acco
 ## Installation
 
 ```bash
-# Install from source
-git clone <repository-url>
+# Install from PyPI (recommended)
+pip install sysvex
+
+# Install from source (for development)
+git clone https://github.com/PuRiToX/sysvex.git
 cd sysvex
 pip install -e .
-
-# Or install dependencies manually
-pip install psutil
 ```
 
 ## Usage
@@ -187,6 +187,12 @@ sysvex --format html --output "security_audit_$(date +%Y%m%d).html"
 sysvex --modules filesystem --format json --output filesystem_audit.json
 ```
 
+## PyPI Information
+
+**Package**: [sysvex](https://pypi.org/project/sysvex/)  
+**Version**: 0.1.1  
+**Status**: Published and ready for installation
+
 ## Development
 
 ```bash
@@ -202,10 +208,6 @@ findings = module.run({'scan_path': '/tmp'})
 print(f'Found {len(findings)} issues')
 "
 ```
-
-## Publishing
-
-See the [publishing guide](https://github.com/PuRiToX/sysvex#publishing) for detailed instructions on publishing to PyPI.
 
 ## License
 
