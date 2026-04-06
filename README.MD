@@ -5,14 +5,13 @@ Modular system security auditing toolkit.
 ## Platform Support
 
 ✅ **Linux** - Full support  
-✅ **Windows** - Full support  
-✅ **macOS** - Full support
+✅ **Windows** - Full support
 
 The app automatically detects your platform and adjusts its security checks accordingly.
 
 ## Features
 
-- **Cross-platform security auditing** for Windows, Linux, and macOS
+- **Cross-platform security auditing** for Windows and Linux
 - **Multiple output formats**: JSON, HTML, CSV, and console
 - **Automated report organization** in Documents folder
 - **Modular architecture** with extensible security modules
@@ -108,15 +107,11 @@ sysvex --format json --quiet
 - **Temp directories**: `%TEMP%`, `%TMP%`, System32 temp
 - **Legitimate paths**: Program Files, System32, ProgramData
 
-### Linux/Unix
+### Linux
 - **Sensitive files**: `/etc/passwd`, `/etc/shadow`, `/etc/sudoers`
 - **SUID/SGID detection**: Unix permission escalation vectors
 - **Unix permissions**: World-readable/writable file detection
 - **Standard paths**: `/usr/bin`, `/bin`, `/sbin`
-
-### macOS
-- Inherits Unix/Linux functionality
-- macOS-specific paths and processes
 
 ## Output Format Examples
 
@@ -161,7 +156,7 @@ sysvex --format json --quiet
 ## Report Organization
 
 Reports are automatically saved to:
-- **Linux/macOS**: `~/Documents/Sysvex Auditing/`
+- **Linux**: `~/Documents/Sysvex Auditing/`
 - **Windows**: `C:\Users\{Username}\Documents\Sysvex Auditing/`
 
 Files are automatically timestamped: `sysvex_report_YYYYMMDD_HHMMSS.format`

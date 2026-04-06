@@ -13,9 +13,6 @@ def is_linux():
     """Check if running on Linux"""
     return get_platform() == 'linux'
 
-def is_macos():
-    """Check if running on macOS"""
-    return get_platform() == 'darwin'
 
 def get_default_reports_dir():
     """Get default reports directory for the current platform"""
@@ -24,7 +21,7 @@ def get_default_reports_dir():
         documents = os.path.expandvars(r'%USERPROFILE%\Documents')
         return os.path.join(documents, 'Sysvex Auditing')
     else:
-        # Linux/macOS: ~/Documents/Sysvex Auditing
+        # Linux: ~/Documents/Sysvex Auditing
         home = os.path.expanduser('~')
         return os.path.join(home, 'Documents', 'Sysvex Auditing')
 
@@ -70,7 +67,7 @@ def get_platform_config():
                 'system', 'smss.exe', 'csrss.exe', 'wininit.exe'
             }
         }
-    else:  # Linux/Unix/macOS
+    else:  # Linux
         return {
             'sensitive_paths': [
                 '/etc/passwd', '/etc/shadow', '/etc/sudoers',
