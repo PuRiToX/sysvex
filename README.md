@@ -19,16 +19,16 @@ The app automatically detects your platform and adjusts its security checks acco
 
 ## Installation
 
+## Install from PyPI (recommended)
 ```bash
-# Install from PyPI (recommended)
 pip install sysvex
-
-# Install from source (for development)
+```
+## Install from source (for development)
+```bash
 git clone https://github.com/PuRiToX/sysvex.git
 cd sysvex
 pip install -e .
 ```
-
 ## Usage
 
 ### Basic Usage
