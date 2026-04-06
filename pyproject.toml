@@ -5,7 +5,7 @@ description = "Modular system security auditing toolkit"
 authors = [
     { name = "PuRIToX" }
 ]
-readme = "README.MD"
+readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
 dependencies = [
