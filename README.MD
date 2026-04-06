@@ -10,6 +10,14 @@ Modular system security auditing toolkit.
 
 The app automatically detects your platform and adjusts its security checks accordingly.
 
+## Features
+
+- **Cross-platform security auditing** for Windows, Linux, and macOS
+- **Multiple output formats**: JSON, HTML, CSV, and console
+- **Automated report organization** in Documents folder
+- **Modular architecture** with extensible security modules
+- **Professional reports** with severity classification and recommendations
+
 ## Installation
 
 ```bash
@@ -27,53 +35,138 @@ pip install psutil
 ### Basic Usage
 
 ```bash
-# Run all default modules (filesystem, network, processes)
-PYTHONPATH=src python -m sysvex.cli
+# Run all default modules (filesystem, network, processes) - console output
+sysvex
 
 # Run specific modules
-PYTHONPATH=src python -m sysvex.cli --modules filesystem,network
+sysvex --modules filesystem,network
 
 # Run single module
-PYTHONPATH=src python -m sysvex.cli --modules processes
+sysvex --modules processes
 ```
 
-### Module Options
+### Output Formats
 
-#### Filesystem Module
-- Scans for world-writable files
-- Detects SUID/SGID executables
-- Checks sensitive file permissions (/etc/passwd, /etc/shadow, etc.)
-- Identifies hidden and recently modified files
-- Default scan path: `/tmp`
+```bash
+# Save to JSON (auto-saved to Documents/Sysvex Auditing/)
+sysvex --format json
 
-#### Network Module
-- Detects services listening on all interfaces (0.0.0.0)
-- Identifies known public services (SSH, HTTP, FTP, etc.)
-- Flags connections to suspicious ports
-- Monitors unusual outbound connections
-- Distinguishes between private and public IP connections
+# Save to HTML report with visual dashboard
+sysvex --format html
 
-#### Process Module
-- Detects suspicious binaries (from /tmp, hidden directories)
-- Identifies suspicious command-line patterns (reverse shells, etc.)
-- Monitors privilege anomalies (SetUID/SetGID)
-- Flags non-system processes running as root
-- Detects memory-only processes
+# Save to CSV for spreadsheet analysis
+sysvex --format csv
 
-### Output Format
-
-The tool outputs findings in the following format:
-```
-[HIGH] World-writable file
-  -> File is writable by others
-  Evidence: /tmp/suspicious_file
-
-[MEDIUM] Hidden file
-  -> Hidden file detected
-  Evidence: /tmp/.hidden_script
+# Console output (default)
+sysvex --format console
 ```
 
-### Severity Levels
+### Custom Output Paths
+
+```bash
+# Custom filename in default directory
+sysvex --format json --output security_audit.json
+
+# Full custom path
+sysvex --format html --output /path/to/report.html
+
+# Windows example
+sysvex --format csv --output C:\Reports\security.csv
+
+# Quiet mode (no console output)
+sysvex --format json --quiet
+```
+
+## Module Options
+
+### Filesystem Module
+- **World-writable files**: Detects files writable by others
+- **SUID/SGID executables**: Identifies files with elevated privileges (Unix only)
+- **Sensitive file permissions**: Checks `/etc/passwd`, `/etc/shadow`, `/etc/sudoers` (Unix) or SAM database (Windows)
+- **Hidden files**: Flags hidden files and temporary files
+- **Recently modified files**: Tracks changes within 7 days
+
+### Network Module
+- **Listening ports**: Detects services listening on all interfaces (0.0.0.0)
+- **Public services**: Identifies known services (SSH, HTTP, FTP, etc.)
+- **Suspicious connections**: Flags connections to known malicious ports
+- **Outbound connections**: Monitors unusual outbound patterns
+- **IP classification**: Distinguishes between private and public IP connections
+
+### Process Module
+- **Suspicious binaries**: Detects processes from unexpected locations
+- **Command-line patterns**: Identifies reverse shells, download tools, persistence mechanisms
+- **Privilege anomalies**: Monitors privilege escalation attempts
+- **System processes**: Flags non-system processes running with elevated privileges
+- **Memory-only processes**: Detects processes without executable paths
+
+## Platform-Specific Features
+
+### Windows
+- **Sensitive files**: SAM database, hosts file, network configurations
+- **Suspicious processes**: PowerShell encoded commands, rundll32, certutil
+- **Temp directories**: `%TEMP%`, `%TMP%`, System32 temp
+- **Legitimate paths**: Program Files, System32, ProgramData
+
+### Linux/Unix
+- **Sensitive files**: `/etc/passwd`, `/etc/shadow`, `/etc/sudoers`
+- **SUID/SGID detection**: Unix permission escalation vectors
+- **Unix permissions**: World-readable/writable file detection
+- **Standard paths**: `/usr/bin`, `/bin`, `/sbin`
+
+### macOS
+- Inherits Unix/Linux functionality
+- macOS-specific paths and processes
+
+## Output Format Examples
+
+### JSON Output
+```json
+{
+  "scan_info": {
+    "timestamp": "2024-01-15T10:30:00",
+    "total_findings": 42,
+    "severity_breakdown": {
+      "CRITICAL": 2,
+      "HIGH": 8,
+      "MEDIUM": 15,
+      "LOW": 17
+    }
+  },
+  "findings": [
+    {
+      "id": "FS-001",
+      "title": "World-writable file",
+      "severity": "HIGH",
+      "description": "File is writable by others",
+      "evidence": "/tmp/suspicious_file",
+      "recommendation": "Restrict permissions: chmod o-w /tmp/suspicious_file",
+      "source_module": "filesystem"
+    }
+  ]
+}
+```
+
+### HTML Report
+- Visual dashboard with color-coded severity levels
+- Summary statistics and charts
+- Expandable finding details
+- Professional appearance for sharing
+
+### CSV Output
+- Spreadsheet-compatible format
+- All finding details in tabular format
+- Easy for data analysis and filtering
+
+## Report Organization
+
+Reports are automatically saved to:
+- **Linux/macOS**: `~/Documents/Sysvex Auditing/`
+- **Windows**: `C:\Users\{Username}\Documents\Sysvex Auditing/`
+
+Files are automatically timestamped: `sysvex_report_YYYYMMDD_HHMMSS.format`
+
+## Severity Levels
 
 - **CRITICAL**: Immediate security risk
 - **HIGH**: Serious security concern
@@ -83,17 +176,20 @@ The tool outputs findings in the following format:
 ## Examples
 
 ```bash
-# Scan filesystem for security issues
-PYTHONPATH=src python -m sysvex.cli --modules filesystem
+# Quick security scan with HTML report
+sysvex --format html
 
-# Check network connections and listening services
-PYTHONPATH=src python -m sysvex.cli --modules network
+# Detailed analysis with JSON for automation
+sysvex --format json --modules all
 
-# Analyze running processes for suspicious activity
-PYTHONPATH=src python -m sysvex.cli --modules processes
+# Silent background scan
+sysvex --format csv --quiet --output security_scan.csv
 
-# Full security audit
-PYTHONPATH=src python -m sysvex.cli
+# Custom filename
+sysvex --format html --output "security_audit_$(date +%Y%m%d).html"
+
+# Scan specific module with custom output
+sysvex --modules filesystem --format json --output filesystem_audit.json
 ```
 
 ## Development
@@ -111,3 +207,24 @@ findings = module.run({'scan_path': '/tmp'})
 print(f'Found {len(findings)} issues')
 "
 ```
+
+## Publishing
+
+See the [publishing guide](https://github.com/PuRiToX/sysvex#publishing) for detailed instructions on publishing to PyPI.
+
+## License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## Support
+
+- **Issues**: [GitHub Issues](https://github.com/PuRiToX/sysvex/issues)
+- **Documentation**: [GitHub Wiki](https://github.com/PuRiToX/sysvex/wiki)
