@@ -1,0 +1,2 @@
+[console_scripts]
+sysvex = sysvex.cli:main

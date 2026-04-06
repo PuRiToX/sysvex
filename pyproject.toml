@@ -1,0 +1,19 @@
+[project]
+name = "sysvex"
+version = "0.1.0"
+description = "Modular system security auditing toolkit"
+authors = [
+    { name = "PuRIToX" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "psutil"
+]
+
+[project.scripts]
+sysvex = "sysvex.cli:main"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
