@@ -25,6 +25,9 @@ jobs:
     - name: Build the package
       run: python -m build
 
+    - name: Check the package
+      run: python -m twine check dist/*
+
     - name: Upload to PyPI
       env:
         TWINE_USERNAME: __token__
