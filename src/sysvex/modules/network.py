@@ -1,11 +1,11 @@
 import psutil
-from .base import BaseModule
 from sysvex.engine.models import Finding
+from .base import BaseModule
 
 class Module(BaseModule):
     name = "network"
 
-    def run(self):
+    def run(self, context=None):
         findings = []
 
         # Get all current network connections
@@ -17,23 +17,25 @@ class Module(BaseModule):
             # High severity: listening on all interfaces
             if conn.status == "LISTEN" and conn.laddr.ip == "0.0.0.0":
                 findings.append(Finding(
-                    id="NET-001",
+                    finding_id="NET-001",
                     title="Service listening on all interfaces",
                     severity="HIGH",
                     description=f"Service listening on 0.0.0.0:{conn.laddr.port}",
                     evidence=f"Local: {laddr}, Remote: {raddr}, Status: {status}",
-                    recommendation="Bind service to specific IP if not intended for public"
+                    recommendation="Bind service to specific IP if not intended for public",
+                    source_module=self.name
                 ))
 
             # Medium severity: established connections to unknown remote addresses
             if conn.status == "ESTABLISHED" and conn.raddr:
                 findings.append(Finding(
-                    id="NET-002",
+                    finding_id="NET-002",
                     title="Established external connection",
                     severity="MEDIUM",
                     description="Connection established to remote host",
                     evidence=f"Local: {laddr}, Remote: {raddr}, Status: {status}",
-                    recommendation="Verify connection is expected"
+                    recommendation="Verify connection is expected",
+                    source_module=self.name
                 ))
 
         return findings

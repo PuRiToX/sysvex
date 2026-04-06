@@ -1,5 +1,5 @@
 class BaseModule:
     name = "base"
 
-    def run(self):
+    def run(self, context=None):
         raise NotImplementedError
