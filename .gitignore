@@ -6,6 +6,11 @@ __pycache__/
 *.sqlite3
 *.log
 
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
 # Virtual environment
 venv/
 .env
