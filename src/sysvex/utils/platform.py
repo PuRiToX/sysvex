@@ -17,6 +17,23 @@ def is_macos():
     """Check if running on macOS"""
     return get_platform() == 'darwin'
 
+def get_default_reports_dir():
+    """Get default reports directory for the current platform"""
+    if is_windows():
+        # Windows: Documents\Sysvex Auditing
+        documents = os.path.expandvars(r'%USERPROFILE%\Documents')
+        return os.path.join(documents, 'Sysvex Auditing')
+    else:
+        # Linux/macOS: ~/Documents/Sysvex Auditing
+        home = os.path.expanduser('~')
+        return os.path.join(home, 'Documents', 'Sysvex Auditing')
+
+def ensure_reports_dir():
+    """Ensure reports directory exists and return path"""
+    reports_dir = get_default_reports_dir()
+    os.makedirs(reports_dir, exist_ok=True)
+    return reports_dir
+
 def get_platform_config():
     """Get platform-specific configuration"""
     if is_windows():
