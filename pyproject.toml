@@ -28,10 +28,10 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/sysvex"
-Repository = "https://github.com/yourusername/sysvex"
-Documentation = "https://github.com/yourusername/sysvex#readme"
-"Bug Tracker" = "https://github.com/yourusername/sysvex/issues"
+Homepage = "https://github.com/PuRiToX/sysvex"
+Repository = "https://github.com/PuRiToX/sysvex"
+Documentation = "https://github.com/PuRiToX/sysvex#readme"
+"Bug Tracker" = "https://github.com/PuRiToX/sysvex/issues"
 
 [project.scripts]
 sysvex = "sysvex.cli:main"
