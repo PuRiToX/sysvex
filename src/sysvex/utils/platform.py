@@ -61,10 +61,43 @@ def get_platform_config():
                 'schtasks.exe', 'sc.exe', 'wevtutil.exe'
             ],
             'legitimate_processes': {
-                'svchost.exe', 'lsass.exe', 'winlogon.exe', 'explorer.exe',
-                'chrome.exe', 'firefox.exe', 'code.exe', 'python.exe',
-                'java.exe', 'node.exe', 'powershell.exe', 'cmd.exe',
-                'system', 'smss.exe', 'csrss.exe', 'wininit.exe'
+                # Core Windows system processes
+                'svchost.exe', 'lsass.exe', 'winlogon.exe', 'services.exe', 'smss.exe',
+                'csrss.exe', 'wininit.exe', 'spoolsv.exe',
+                # Windows utilities and services
+                'explorer.exe', 'dwm.exe', 'taskhostw.exe', 'sihost.exe', 'fontdrvhost.exe',
+                'dllhost.exe', 'regsvr32.exe', 'SearchIndexer.exe', 'SearchProtocolHost.exe',
+                'WmiPrvSE.exe', 'wlanext.exe', 'conhost.exe', 'backgroundtaskhost.exe',
+                'RuntimeBroker.exe', 'ShellExperienceHost.exe', 'StartMenuExperienceHost.exe',
+                'ApplicationFrameHost.exe', 'GameBar.exe', 'SearchUI.exe', 'SecurityHealthSystray.exe',
+                'ctfmon.exe', 'TextInputHost.exe', 'NisSrv.exe', 'MsMpEng.exe', 'MpCmdRun.exe',
+                # Common development/browsing tools
+                'chrome.exe', 'firefox.exe', 'msedge.exe', 'opera.exe', 'brave.exe',
+                'code.exe', 'devenv.exe', 'jetbrains', 'pycharm', 'webstorm',
+                'python.exe', 'pythonw.exe', 'java.exe', 'javaw.exe', 'node.exe',
+                'git.exe', 'cmd.exe', 'powershell.exe', 'wt.exe', 'WindowsTerminal.exe',
+                # Other common apps
+                'slack.exe', 'discord.exe', 'teams.exe', 'zoom.exe', 'spotify.exe',
+                'steam.exe', 'epicgameslauncher.exe', 'discordptb.exe', 'discordcanary.exe',
+            },
+            'default_exclusions': {
+                # Version control
+                '.git', '.svn', '.hg', '.bzr',
+                # Python
+                '__pycache__', '*.pyc', '*.pyo', '*.egg-info', '.pytest_cache',
+                '.venv', 'venv', 'env', '.env', '.tox',
+                # Node.js
+                'node_modules', 'bower_components',
+                # IDEs
+                '.idea', '.vscode', '.vs',
+                # Build artifacts
+                'build', 'dist', 'target', '.gradle', '.cache',
+                # Logs
+                '*.log', 'logs',
+                # Windows system
+                'System Volume Information', '$RECYCLE.BIN', 'Windows.old',
+                'pagefile.sys', 'hiberfil.sys', 'swapfile.sys',
+                'DumpStack.log.tmp', 'DumpStack.log',
             }
         }
     else:  # Linux
@@ -96,10 +129,44 @@ def get_platform_config():
                 'passwd', 'shadow', '/etc/passwd'
             ],
             'legitimate_processes': {
-                'init', 'kthreadd', 'ksoftirqd', 'migration', 'rcu_', 'watchdog',
-                'systemd', 'kmod', 'udevd', 'NetworkManager', 'gdm', 'Xorg',
-                'gnome-shell', 'firefox', 'chrome', 'chromium', 'code', 'vim',
-                'bash', 'zsh', 'fish', 'python', 'python3', 'node', 'java'
+                # Linux kernel threads
+                'init', 'systemd', 'kthreadd', 'ksoftirqd', 'migration', 'rcu_', 'watchdog',
+                'kmod', 'udevd', 'khugepaged', 'kworker', 'kblockd',
+                # System services
+                'NetworkManager', 'gdm', 'Xorg', 'Xwayland', 'gnome-shell', 'gnome-session',
+                'plasmashell', 'kwin_x11', 'kwin_wayland', 'ksmserver',
+                'dbus-daemon', 'polkitd', 'pipewire', 'pipewire-pulse', 'wireplumber',
+                'pulseaudio', 'rtkit-daemon', 'accounts-daemon', 'avahi-daemon',
+                # Common development/browsing tools
+                'firefox', 'chrome', 'chromium', 'brave', 'opera',
+                'code', 'vim', 'nvim', 'emacs', 'kate', 'gedit', 'mousepad',
+                'python', 'python3', 'node', 'java', 'docker', 'containerd',
+                'git', 'ssh-agent', 'gpg-agent', 'bash', 'zsh', 'fish', 'tmux', 'screen',
+                # Shell and terminals
+                'gnome-terminal-', 'konsole', 'xfce4-terminal', 'alacritty', 'kitty',
+                'terminator', 'tilix', 'rxvt', 'xterm',
+                # Desktop environment components
+                'nautilus', 'dolphin', 'thunar', 'pcmanfm', 'caja',
+                # Common apps
+                'slack', 'discord', 'zoom', 'teams', 'spotify', 'vlc',
+            },
+            'default_exclusions': {
+                # Version control
+                '.git', '.svn', '.hg', '.bzr',
+                # Python
+                '__pycache__', '*.pyc', '*.pyo', '*.egg-info', '.pytest_cache',
+                '.venv', 'venv', 'env', '.env', '.tox',
+                # Node.js
+                'node_modules', 'bower_components',
+                # IDEs
+                '.idea', '.vscode', '.vs',
+                # Build artifacts
+                'build', 'dist', 'target', '.gradle', '.cache',
+                # Logs
+                '*.log', 'logs',
+                # System directories to skip entirely
+                '/proc', '/sys', '/dev', '/run', '/snap',
+                '/boot', '/lost+found',
             }
         }
 

@@ -22,15 +22,19 @@ class Module(BaseModule):
 
     def run(self, context=None):
         findings = []
-        
-        # Get listening ports
+
+        # Get all network connections once (performance fix)
+        try:
+            all_connections = psutil.net_connections(kind='inet')
+        except (psutil.AccessDenied, psutil.Error):
+            # Can't access network connections on some systems
+            return findings
+
+        # Build listening ports set for efficient lookup
         listening_ports = {}
-        for conn in psutil.net_connections(kind='inet'):
+        for conn in all_connections:
             if conn.status == "LISTEN" and conn.laddr:
                 listening_ports[conn.laddr.port] = conn
-        
-        # Get all current network connections
-        for conn in psutil.net_connections(kind='inet'):
             laddr = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else "N/A"
             raddr = f"{conn.raddr.ip}:{conn.raddr.port}" if conn.raddr else "N/A"
             status = conn.status

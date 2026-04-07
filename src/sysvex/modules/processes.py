@@ -7,7 +7,12 @@ class Module(BaseModule):
     name = "processes"
 
     def run(self, context=None):
-        config = get_platform_config()
+        # Get config from context if available, else load fresh
+        if context and 'platform_config' in context:
+            config = context['platform_config']
+        else:
+            config = get_platform_config()
+
         findings = []
 
         for proc in psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username']):
@@ -18,12 +23,18 @@ class Module(BaseModule):
                 if not proc_info['name'] or not proc_info['exe']:
                     continue
 
-                # Check for unsigned/unexpected binaries
+                # Check for unsigned/unexpected binaries (skip common interpreters)
                 if self._is_suspicious_binary(proc_info['exe'], config):
+                    # Reduce severity for common development tools
+                    severity = "HIGH"
+                    if any(tool in proc_info['name'].lower() for tool in ['python', 'node', 'java', 'code', 'chrome', 'firefox']):
+                        if not any(temp in proc_info['exe'].lower() for temp in config.get('temp_dirs', [])):
+                            severity = "LOW"  # Common tool, not in temp dir = likely legitimate
+
                     findings.append(Finding(
                         finding_id="PROC-001",
                         title="Suspicious or unsigned binary",
-                        severity="HIGH",
+                        severity=severity,
                         description=f"Process running from suspicious location: {proc_info['exe']}",
                         evidence=f"PID: {proc_info['pid']}, Name: {proc_info['name']}, Path: {proc_info['exe']}",
                         recommendation="Investigate binary authenticity and origin",
@@ -109,16 +120,18 @@ class Module(BaseModule):
                     pass
 
                 # Check for processes with no executable path (potential malware)
+                # Skip kernel processes on Linux which legitimately have no exe path
                 if not proc_info['exe'] and proc_info['name']:
-                    findings.append(Finding(
-                        finding_id="PROC-006",
-                        title="Process without executable path",
-                        severity="HIGH",
-                        description=f"Process {proc_info['name']} has no associated executable",
-                        evidence=f"PID: {proc_info['pid']}, Name: {proc_info['name']}",
-                        recommendation="Investigate potential memory-only malware",
-                        source_module=self.name
-                    ))
+                    if not (proc_info['name'].startswith('[') and proc_info['name'].endswith(']')):
+                        findings.append(Finding(
+                            finding_id="PROC-006",
+                            title="Process without executable path",
+                            severity="HIGH",
+                            description=f"Process {proc_info['name']} has no associated executable",
+                            evidence=f"PID: {proc_info['pid']}, Name: {proc_info['name']}",
+                            recommendation="Investigate potential memory-only malware",
+                            source_module=self.name
+                        ))
 
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                 continue
