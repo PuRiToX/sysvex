@@ -10,7 +10,7 @@ class Module(BaseModule):
         config = get_platform_config()
         findings = []
 
-        for proc in psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username', 'uids', 'gids']):
+        for proc in psutil.process_iter(['pid', 'name', 'exe', 'cmdline', 'username']):
             try:
                 proc_info = proc.info
                 
@@ -47,58 +47,66 @@ class Module(BaseModule):
                             break  # Only report once per process
 
                 # Check for privilege anomalies
-                if proc_info['uids'] and proc_info['gids']:
-                    real_uid, effective_uid, saved_uid = proc_info['uids']
-                    real_gid, effective_gid, saved_gid = proc_info['gids']
+                try:
+                    uids = proc.uids() if hasattr(proc, 'uids') else None
+                    gids = proc.gids() if hasattr(proc, 'gids') else None
+                    
+                    if uids and gids:
+                        real_uid, effective_uid, saved_uid = uids
+                        real_gid, effective_gid, saved_gid = gids
 
-                    # Process running with elevated privileges (Unix: root, Windows: admin)
-                    if is_windows():
-                        # Windows: Check for SYSTEM or Administrator privileges
-                        if effective_uid == 0 and not self._is_system_process(proc_info['name'], config):
-                            findings.append(Finding(
-                                finding_id="PROC-003",
-                                title="Non-system process with elevated privileges",
-                                severity="MEDIUM",
-                                description=f"Process {proc_info['name']} running with elevated privileges",
-                                evidence=f"PID: {proc_info['pid']}, Name: {proc_info['name']}, User: {proc_info['username']}",
-                                recommendation="Verify if elevated privileges are necessary",
-                                source_module=self.name
-                            ))
-                    else:
-                        # Unix: Check for root privileges
-                        if effective_uid == 0 and not self._is_system_process(proc_info['name'], config):
-                            findings.append(Finding(
-                                finding_id="PROC-003",
-                                title="Non-system process running as root",
-                                severity="MEDIUM",
-                                description=f"Process {proc_info['name']} running with root privileges",
-                                evidence=f"PID: {proc_info['pid']}, Name: {proc_info['name']}, User: {proc_info['username']}",
-                                recommendation="Verify if root privileges are necessary",
-                                source_module=self.name
-                            ))
+                        # Process running with elevated privileges (Unix: root, Windows: admin)
+                        if is_windows():
+                            # Windows: Check for SYSTEM or Administrator privileges
+                            if effective_uid == 0 and not self._is_system_process(proc_info['name'], config):
+                                findings.append(Finding(
+                                    finding_id="PROC-003",
+                                    title="Non-system process with elevated privileges",
+                                    severity="MEDIUM",
+                                    description=f"Process {proc_info['name']} running with elevated privileges",
+                                    evidence=f"PID: {proc_info['pid']}, Name: {proc_info['name']}, User: {proc_info['username']}",
+                                    recommendation="Verify if elevated privileges are necessary",
+                                    source_module=self.name
+                                ))
+                        else:
+                            # Unix: Check for root privileges
+                            if effective_uid == 0 and not self._is_system_process(proc_info['name'], config):
+                                findings.append(Finding(
+                                    finding_id="PROC-003",
+                                    title="Non-system process running as root",
+                                    severity="MEDIUM",
+                                    description=f"Process {proc_info['name']} running with root privileges",
+                                    evidence=f"PID: {proc_info['pid']}, Name: {proc_info['name']}, User: {proc_info['username']}",
+                                    recommendation="Verify if root privileges are necessary",
+                                    source_module=self.name
+                                ))
 
-                    # SetUID/SetGID anomalies
-                    if real_uid != effective_uid:
-                        findings.append(Finding(
-                            finding_id="PROC-004",
-                            title="Process with elevated user privileges",
-                            severity="HIGH",
-                            description=f"Process running with different effective UID than real UID",
-                            evidence=f"PID: {proc_info['pid']}, Real UID: {real_uid}, Effective UID: {effective_uid}",
-                            recommendation="Investigate privilege escalation",
-                            source_module=self.name
-                        ))
+                        # SetUID/SetGID anomalies (Unix only)
+                        if not is_windows():
+                            if real_uid != effective_uid:
+                                findings.append(Finding(
+                                    finding_id="PROC-004",
+                                    title="Process with elevated user privileges",
+                                    severity="HIGH",
+                                    description="Process running with different effective UID than real UID",
+                                    evidence=f"PID: {proc_info['pid']}, Real UID: {real_uid}, Effective UID: {effective_uid}",
+                                    recommendation="Investigate privilege escalation",
+                                    source_module=self.name
+                                ))
 
-                    if real_gid != effective_gid:
-                        findings.append(Finding(
-                            finding_id="PROC-005",
-                            title="Process with elevated group privileges",
-                            severity="MEDIUM",
-                            description=f"Process running with different effective GID than real GID",
-                            evidence=f"PID: {proc_info['pid']}, Real GID: {real_gid}, Effective GID: {effective_gid}",
-                            recommendation="Investigate group privilege escalation",
-                            source_module=self.name
-                        ))
+                            if real_gid != effective_gid:
+                                findings.append(Finding(
+                                    finding_id="PROC-005",
+                                    title="Process with elevated group privileges",
+                                    severity="MEDIUM",
+                                    description="Process running with different effective GID than real GID",
+                                    evidence=f"PID: {proc_info['pid']}, Real GID: {real_gid}, Effective GID: {effective_gid}",
+                                    recommendation="Investigate group privilege escalation",
+                                    source_module=self.name
+                                ))
+                except (AttributeError, OSError):
+                    # Skip privilege checks if not available on this platform
+                    pass
 
                 # Check for processes with no executable path (potential malware)
                 if not proc_info['exe'] and proc_info['name']:
